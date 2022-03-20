@@ -1,7 +1,14 @@
+
+#global import
+import sys
+import time
+
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
 #param solucao deve ser uma lista de inteiros identificando as tarefas (de 1 até n onde n é o número de tarefas da instância)
 #param instancia deve ser uma lista de listas m X n, onde m é o número de máquinas e n o número de tarefas, com inteiros identificando os tempos de cada tarefa em cada máquina
+
+
 def makespan (instancia, solucao):
     nM = len(instancia)
     tempo = [0] * nM
@@ -69,7 +76,12 @@ print (makespan(instancia,solucao2))
 print (makespan(instancia,solucao3))
 print (makespan(instancia,solucao4))
 
+#TODO ler os arquivos
 listaArquivos = []
+criterioParada2 = 0 #TODO definir o critério de parada
+
+X = 0 #TODO definir o valor do x e se possível remover essa declaração
+
 listaInstancias = lerInstancias(listaArquivos)
 relatorio = [dict() for instancia in range(listaInstancias)]
 for instancia in range (listaInstancias):
@@ -81,10 +93,10 @@ for instancia in range (listaInstancias):
         melhorSolucao = {'solucao':[], 'aptidao':sys.maxint, 'tempoFinal':0}
         tempoInicial = time.time()
         populacao = criarPopulacaoInicial(instancia, tamanhoPop)
-        while true:
+        while True:
             if tempoMaximo <= time.time() - tempoInicial:
                 break
-            if criterioParada2 == true:
+            if criterioParada2:
                 break
             aptidaoPop = avaliarPop(populacao)
             melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
