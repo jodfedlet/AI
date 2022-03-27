@@ -4,8 +4,6 @@ import sys
 import time
 import random
 
-from numpy import append
-
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
 #param solucao deve ser uma lista de inteiros identificando as tarefas (de 1 até n onde n é o número de tarefas da instância)
@@ -42,22 +40,6 @@ def getFirstInstanceOfFile(file):
 #ler a primeira instância de cada um dos dez arquivos, armazenar em uma lista e retornar essa lista
 def lerInstancias(files):
     return [getFirstInstanceOfFile(file) for file in files]
-
-'''
-instancia = [[54, 83, 15],
-             [79, 3, 11],
-             [16, 89, 49],
-             [66, 58, 31],
-             [58, 56, 20]]
-solucao1 = [1,2,3]
-solucao2 = [2,1,3]
-solucao3 = [3,1,2]
-solucao4 = [3,1,1]
-print (makespan(instancia,solucao1))
-print (makespan(instancia,solucao2))
-print (makespan(instancia,solucao3))
-print (makespan(instancia,solucao4))
-'''
 
 #criar uma lista de soluções aleatórias (podem definir outro critério se desejarem) com o tamanho repassado
 def criarPopulacaoInicial(instance, size):
