@@ -51,7 +51,7 @@ def avaliarPop(population, instance):
     times = []
     for solution in population:
         time = makespan(instance, solution)
-        if(time > 0):
+        if time > 0:
             times.append(time)
     return times
 
