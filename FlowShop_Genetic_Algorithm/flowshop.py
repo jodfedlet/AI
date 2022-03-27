@@ -48,16 +48,18 @@ def criarPopulacaoInicial(instance, size):
      
 #usar a função makespan para avalaiar a aptidão de cada elemento da população
 def avaliarPop(population, instance):
-    times = []
+    time = sys.maxsize
+    evaluation = {}
     for solution in population:
-        time = makespan(instance, solution)
-        if time > 0:
-            times.append(time)
-    return times
+        result = makespan(instance, solution)
+        if result > 0 and result < time:
+            evaluation.update({'aptidao': result, 'solucao':solution})
+            time = result
+    return evaluation
 
 #retorna a melhor solucao dentre a populacao atual
-def retornaMelhorSolucao(populacao, aptidaoPop):
-    pass
+def retornaMelhorSolucao(aptidaoPop):
+    return {'solucao':aptidaoPop['solucao'], 'aptidao':aptidaoPop['aptidao'], 'tempoFinal': (time.time() - tempoInicial)}
 
 #função deve retornar quais elementos serão recombinados e com quem (pode fazer uso da aptidao ou não para o critério de seleção)
 def selecionarPop(populacao, aptidaoPop):
@@ -114,32 +116,40 @@ listaInstancias = lerInstancias(allFiles)
 #relatorio = [dict() for instancia in range(listaInstancias)]
 
 for instancia in listaInstancias:
-    tamanhoPop = 4
-    tempoMaximo = X
+    tamanhoPop = 5
+    tempoMaximo = X #tamanho a ser definido
     #Para cada instância executar todo o algoritmo 10 vezes
     #melhoresSolucoes = relatorio[instancia]
     for it in range (10):
         melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
         tempoInicial = time.time()
         populacao = criarPopulacaoInicial(instancia, tamanhoPop)
+    
         #print(populacao)
+        
+        #print(sys.maxsize)
     
         while True:
             #if tempoMaximo <= time.time() - tempoInicial:
                 #break
-            if criterioParada2:
+            if criterioParada2: #critério de parada a ser definida
                 break
             aptidaoPop = avaliarPop(populacao, instancia)
-            print(aptidaoPop)
-            break
-            melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
+            
+            melhorSolucaoAtual = retornaMelhorSolucao(aptidaoPop)
             if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
                 melhorSolucao = melhorSolucaoAtual
+            print(melhorSolucao)
+            print(melhorSolucaoAtual)
+            #break
+            break
+            '''    
             populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
             novasSolucoes = recombinacao(populacaoSelecionada)
             novasSolucoes = mutacao(novasSolucoes)
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
-        #melhorSolucao['tempoFinal'] = time.time() - tempoInicial
+            '''
+        melhorSolucao['tempoFinal'] = time.time() - tempoInicial
         #print(melhorSolucao)
         #melhoresSolucoes = melhoresSolucoes | melhorSolucao
         break
