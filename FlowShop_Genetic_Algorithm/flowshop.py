@@ -2,12 +2,14 @@
 #global import
 import sys
 import time
+import random
+
+from numpy import append
 
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
 #param solucao deve ser uma lista de inteiros identificando as tarefas (de 1 até n onde n é o número de tarefas da instância)
 #param instancia deve ser uma lista de listas m X n, onde m é o número de máquinas e n o número de tarefas, com inteiros identificando os tempos de cada tarefa em cada máquina
-
 
 def makespan (instancia, solucao):
     nM = len(instancia)
@@ -24,17 +26,52 @@ def makespan (instancia, solucao):
             tempo[m] += instancia[m][t-1] 
     return tempo[nM-1]
 
+def cleanFilterInstance(value):
+    if value != '' and value != ' ':
+        return int(value)
+
+def getFirstInstanceOfFile(file):
+    firstInstance = [];
+    for index, line in enumerate(list(open(file))):
+        if index <= 2: continue
+        if index > 2 and line.startswith('number'):
+            break
+        firstInstance.append(list(map(lambda a: int(a),filter(cleanFilterInstance,line.strip().split(" ")))))   
+    return firstInstance    
+
 #ler a primeira instância de cada um dos dez arquivos, armazenar em uma lista e retornar essa lista
-def lerInstancias(listaArquivos):
-    pass
+def lerInstancias(files):
+    return [getFirstInstanceOfFile(file) for file in files]
+
+'''
+instancia = [[54, 83, 15],
+             [79, 3, 11],
+             [16, 89, 49],
+             [66, 58, 31],
+             [58, 56, 20]]
+solucao1 = [1,2,3]
+solucao2 = [2,1,3]
+solucao3 = [3,1,2]
+solucao4 = [3,1,1]
+print (makespan(instancia,solucao1))
+print (makespan(instancia,solucao2))
+print (makespan(instancia,solucao3))
+print (makespan(instancia,solucao4))
+'''
 
 #criar uma lista de soluções aleatórias (podem definir outro critério se desejarem) com o tamanho repassado
-def criarPopulacaoInicial(instancia, tamanho):
-    pass
-
+def criarPopulacaoInicial(instance, size):
+    nElement = len(instance[0])
+    return [random.sample(range(1, nElement+1), nElement) for _ in range(size)]
+     
 #usar a função makespan para avalaiar a aptidão de cada elemento da população
-def avaliarPop(populacao):
-    pass
+def avaliarPop(population, instance):
+    times = []
+    for solution in population:
+        time = makespan(instance, solution)
+        if(time > 0):
+            times.append(time)
+    return times
 
 #retorna a melhor solucao dentre a populacao atual
 def retornaMelhorSolucao(populacao, aptidaoPop):
@@ -62,6 +99,8 @@ def salvarRelatorio(relatorio):
     pass
 
 #Exemplo de uso do makespan
+
+'''
 instancia = [[54, 83, 15],
              [79, 3, 11],
              [16, 89, 49],
@@ -75,30 +114,42 @@ print (makespan(instancia,solucao1))
 print (makespan(instancia,solucao2))
 print (makespan(instancia,solucao3))
 print (makespan(instancia,solucao4))
+'''
+
 
 #TODO ler os arquivos
-listaArquivos = []
-criterioParada2 = 0 #TODO definir o critério de parada
+allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
+                 'tai50_5.txt','tai50_10.txt','tai50_20.txt',
+                 'tai100_5.txt','tai100_10.txt','tai100_20.txt',
+                 'tai200_10.txt'
+        ]
+criterioParada2 = False #TODO definir o critério de parada
 
 X = 0 #TODO definir o valor do x e se possível remover essa declaração
 
-listaInstancias = lerInstancias(listaArquivos)
-relatorio = [dict() for instancia in range(listaInstancias)]
-for instancia in range (listaInstancias):
-    tamanhoPop = X
+listaInstancias = lerInstancias(allFiles)
+
+#relatorio = [dict() for instancia in range(listaInstancias)]
+
+for instancia in listaInstancias:
+    tamanhoPop = 4
     tempoMaximo = X
     #Para cada instância executar todo o algoritmo 10 vezes
-    melhoresSolucoes = relatorio[instancia]
+    #melhoresSolucoes = relatorio[instancia]
     for it in range (10):
-        melhorSolucao = {'solucao':[], 'aptidao':sys.maxint, 'tempoFinal':0}
+        melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
         tempoInicial = time.time()
         populacao = criarPopulacaoInicial(instancia, tamanhoPop)
+        #print(populacao)
+    
         while True:
-            if tempoMaximo <= time.time() - tempoInicial:
-                break
+            #if tempoMaximo <= time.time() - tempoInicial:
+                #break
             if criterioParada2:
                 break
-            aptidaoPop = avaliarPop(populacao)
+            aptidaoPop = avaliarPop(populacao, instancia)
+            print(aptidaoPop)
+            break
             melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
             if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
                 melhorSolucao = melhorSolucaoAtual
@@ -106,8 +157,10 @@ for instancia in range (listaInstancias):
             novasSolucoes = recombinacao(populacaoSelecionada)
             novasSolucoes = mutacao(novasSolucoes)
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
-        melhorSolucao['tempoFinal'] = time.time() - tempoInicial
-        print(melhorSolucao)
-        melhoresSolucoes = melhoresSolucoes | melhorSolucao
-    relatorio[instancia] = melhoresSolucoes
-salvarRelatorio(relatorio)
+        #melhorSolucao['tempoFinal'] = time.time() - tempoInicial
+        #print(melhorSolucao)
+        #melhoresSolucoes = melhoresSolucoes | melhorSolucao
+        break
+    break
+    #relatorio[instancia] = melhoresSolucoes
+#salvarRelatorio(relatorio)
