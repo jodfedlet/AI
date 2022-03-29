@@ -117,7 +117,7 @@ listaInstancias = lerInstancias(allFiles)
 
 for instancia in listaInstancias:
     tamanhoPop = 100
-    tempoMaximo = X #tamanho a ser definido
+    tempoMaximo = X
     #Para cada instância executar todo o algoritmo 10 vezes
     #melhoresSolucoes = relatorio[instancia]
     for it in range (10):
