@@ -134,6 +134,7 @@ for instancia in listaInstancias:
                 #break
             if criterioParada2 >= 5: #critério de parada a ser definida
                 break
+                
             aptidaoPop = avaliarPop(populacao, instancia)
             
             melhorSolucaoAtual = retornaMelhorSolucao(aptidaoPop)
@@ -141,8 +142,6 @@ for instancia in listaInstancias:
                 melhorSolucao = melhorSolucaoAtual
             print(melhorSolucao)
             print(melhorSolucaoAtual)
-            #break
-            break
             '''    
             populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
             novasSolucoes = recombinacao(populacaoSelecionada)
