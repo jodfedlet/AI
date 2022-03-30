@@ -107,7 +107,7 @@ allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                  'tai100_5.txt','tai100_10.txt','tai100_20.txt',
                  'tai200_10.txt'
         ]
-criterioParada2 = False #TODO definir o critério de parada
+criterioParada2 = 0 #TODO definir o critério de parada
 
 X = 0 #TODO definir o valor do x e se possível remover essa declaração
 
@@ -132,7 +132,7 @@ for instancia in listaInstancias:
         while True:
             #if tempoMaximo <= time.time() - tempoInicial:
                 #break
-            if criterioParada2: #critério de parada a ser definida
+            if criterioParada2 >= 5: #critério de parada a ser definida
                 break
             aptidaoPop = avaliarPop(populacao, instancia)
             
@@ -149,6 +149,7 @@ for instancia in listaInstancias:
             novasSolucoes = mutacao(novasSolucoes)
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
             '''
+            criterioParada2+=1
         melhorSolucao['tempoFinal'] = time.time() - tempoInicial
         #print(melhorSolucao)
         #melhoresSolucoes = melhoresSolucoes | melhorSolucao
