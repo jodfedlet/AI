@@ -73,9 +73,9 @@ def recombinacao(populacaoSelecionada):
 def mutacao(novasSolucoes):
     pass
 
+#função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     pass
-#função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
