@@ -149,7 +149,7 @@ for instancia in listaInstancias:
             novasSolucoes = mutacao(novasSolucoes)
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
             '''
-            criterioParada2+=1
+            criterioParada2 += 1
         melhorSolucao['tempoFinal'] = time.time() - tempoInicial
         #print(melhorSolucao)
         #melhoresSolucoes = melhoresSolucoes | melhorSolucao
