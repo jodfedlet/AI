@@ -1,5 +1,6 @@
 
 #global import
+import json
 import sys
 import time
 import random
@@ -35,7 +36,10 @@ def getFirstInstanceOfFile(file):
         if index > 2 and line.startswith('number'):
             break
         firstInstance.append(list(map(lambda a: int(a),filter(cleanFilterInstance,line.strip().split(" ")))))   
-    return firstInstance    
+    return firstInstance 
+
+def merge_list_into_tuple(key_list, list_value):
+    return sorted(list(zip(key_list, list_value)))
 
 #ler a primeira instância de cada um dos dez arquivos, armazenar em uma lista e retornar essa lista
 def lerInstancias(files):
@@ -48,30 +52,46 @@ def criarPopulacaoInicial(instance, size):
      
 #usar a função makespan para avalaiar a aptidão de cada elemento da população
 def avaliarPop(population, instance):
-    time = sys.maxsize
-    evaluation = {}
-    for solution in population:
-        result = makespan(instance, solution)
-        if result > 0 and result < time:
-            evaluation.update({'aptidao': result, 'solucao':solution})
-            time = result
-    return evaluation
+    return [makespan(instance, solution) for solution in population]
 
 #retorna a melhor solucao dentre a populacao atual
-def retornaMelhorSolucao(aptidaoPop):
-    return {'solucao':aptidaoPop['solucao'], 'aptidao':aptidaoPop['aptidao'], 'tempoFinal': (time.time() - tempoInicial)}
+def retornaMelhorSolucao(populacao, aptidaoPop):
+    best = merge_list_into_tuple(aptidaoPop, populacao)[0]
+    return {'solucao':best[1], 'aptidao':best[0], 'tempoFinal': (time.time() - tempoInicial)}
 
 #função deve retornar quais elementos serão recombinados e com quem (pode fazer uso da aptidao ou não para o critério de seleção)
 def selecionarPop(populacao, aptidaoPop):
-    pass
+    selected_people = merge_list_into_tuple(aptidaoPop, populacao)
+    return [i[1] for i in selected_people[:int(len(selected_people)/2)]] 
 
-#função deve usar o operador de recombinacao (definido pelo grupo_ para gerar novas soluções filhas
+def get_random_pos(list_):
+    return random.randrange(len(list_))
+    
+#função deve usar o operador de recombinacao (definido pelo grupo_ para gerar novas soluções filhas)
 def recombinacao(populacaoSelecionada):
-    pass
+    solutions = []
+    for i in range(0,len(populacaoSelecionada) - 1, 2):
+        current_solution = populacaoSelecionada[i]
+        next_solution = populacaoSelecionada[i+1]
+        random_pos = get_random_pos(current_solution)
+        #to concatenate two list ex: res = [*l1, *l2]
+        solutions.extend([[*current_solution[:random_pos], *next_solution[random_pos:]], [*next_solution[:random_pos], *current_solution[random_pos:]]]) 
+    return solutions
 
 #função deve usar o operador de mutacao (definido pelo grupo) para modificar as soluções filhas (não precisa ser todas)
-def mutacao(novasSolucoes):
-    pass
+def mutacao(novasSolucoes, mutation_rate):
+    mutation_rate = mutation_rate / 100
+    for solution in novasSolucoes:
+        rand_pos = get_random_pos(solution)
+        current_item = solution[rand_pos]
+        
+        while True:
+            random_item = random.randint(1, len(solution))
+            if random_item != current_item:
+                solution[rand_pos] = random_item
+                break
+    
+    return novasSolucoes
 
 def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     pass
@@ -81,6 +101,10 @@ def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
 def salvarRelatorio(relatorio):
     pass
+
+def format_print(data):
+    print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
+       
 
 #Exemplo de uso do makespan
 
@@ -110,43 +134,43 @@ allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
 criterioParada2 = False #TODO definir o critério de parada
 
 X = 0 #TODO definir o valor do x e se possível remover essa declaração
+import json
 
 listaInstancias = lerInstancias(allFiles)
 
 #relatorio = [dict() for instancia in range(listaInstancias)]
 
 for instancia in listaInstancias:
-    tamanhoPop = 5
-    tempoMaximo = X #tamanho a ser definido
+    tamanhoPop = 4
+    tempoMaximo = 1 #tamanho a ser definido
+    mutation_rate = 1
     #Para cada instância executar todo o algoritmo 10 vezes
     #melhoresSolucoes = relatorio[instancia]
     for it in range (10):
         melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
         tempoInicial = time.time()
         populacao = criarPopulacaoInicial(instancia, tamanhoPop)
-    
-        #print(populacao)
-        
-        #print(sys.maxsize)
-    
+       
         while True:
-            #if tempoMaximo <= time.time() - tempoInicial:
-                #break
-            if criterioParada2: #critério de parada a ser definida
+            if tempoMaximo <= time.time() - tempoInicial:
                 break
-            aptidaoPop = avaliarPop(populacao, instancia)
             
-            melhorSolucaoAtual = retornaMelhorSolucao(aptidaoPop)
+            #if criterioParada2: #critério de parada a ser definida
+                #break
+            aptidaoPop = avaliarPop(populacao, instancia)
+           
+            melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
+           
             if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
-                melhorSolucao = melhorSolucaoAtual
-            print(melhorSolucao)
-            print(melhorSolucaoAtual)
-            #break
+                melhorSolucao = melhorSolucaoAtual  
+                
+            novasSolucoes = recombinacao(selecionarPop(populacao, aptidaoPop))
+            format_print(novasSolucoes)
+            novasSolucoes = mutacao(novasSolucoes, mutation_rate)
+            format_print(novasSolucoes)
             break
-            '''    
-            populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
-            novasSolucoes = recombinacao(populacaoSelecionada)
-            novasSolucoes = mutacao(novasSolucoes)
+            
+            '''
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
             '''
         melhorSolucao['tempoFinal'] = time.time() - tempoInicial
