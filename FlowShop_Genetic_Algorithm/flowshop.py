@@ -93,9 +93,9 @@ def mutacao(novasSolucoes, mutation_rate):
     
     return novasSolucoes
 
+#função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     pass
-#função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
@@ -131,7 +131,7 @@ allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                  'tai100_5.txt','tai100_10.txt','tai100_20.txt',
                  'tai200_10.txt'
         ]
-criterioParada2 = False #TODO definir o critério de parada
+criterioParada2 = 0 #TODO definir o critério de parada
 
 X = 0 #TODO definir o valor do x e se possível remover essa declaração
 import json
@@ -173,6 +173,7 @@ for instancia in listaInstancias:
             '''
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
             '''
+            criterioParada2 += 1
         melhorSolucao['tempoFinal'] = time.time() - tempoInicial
         #print(melhorSolucao)
         #melhoresSolucoes = melhoresSolucoes | melhorSolucao
