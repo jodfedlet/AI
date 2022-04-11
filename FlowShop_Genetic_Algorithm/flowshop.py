@@ -1,6 +1,4 @@
 
-#global import
-import json
 import sys
 import time
 import random
@@ -105,26 +103,6 @@ def salvarRelatorio(relatorio):
 def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
        
-
-#Exemplo de uso do makespan
-
-'''
-instancia = [[54, 83, 15],
-             [79, 3, 11],
-             [16, 89, 49],
-             [66, 58, 31],
-             [58, 56, 20]]
-solucao1 = [1,2,3]
-solucao2 = [2,1,3]
-solucao3 = [3,1,2]
-solucao4 = [3,1,3]
-print (makespan(instancia,solucao1))
-print (makespan(instancia,solucao2))
-print (makespan(instancia,solucao3))
-print (makespan(instancia,solucao4))
-'''
-
-
 #TODO ler os arquivos
 allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                  'tai50_5.txt','tai50_10.txt','tai50_20.txt',
