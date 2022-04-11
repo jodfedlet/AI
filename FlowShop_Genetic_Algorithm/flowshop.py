@@ -57,7 +57,7 @@ def avaliarPop(population, instance):
 #retorna a melhor solucao dentre a populacao atual
 def retornaMelhorSolucao(populacao, aptidaoPop):
     best = merge_list_into_tuple(aptidaoPop, populacao)[0]
-    return {'solucao':best[1], 'aptidao':best[0], 'tempoFinal': (time.time() - tempoInicial)}
+    return {'solucao':best[1], 'aptidao':best[0], 'tempoFinal': 0}
 
 #função deve retornar quais elementos serão recombinados e com quem (pode fazer uso da aptidao ou não para o critério de seleção)
 def selecionarPop(populacao, aptidaoPop):
@@ -138,14 +138,17 @@ import json
 
 listaInstancias = lerInstancias(allFiles)
 
-#relatorio = [dict() for instancia in range(listaInstancias)]
+relatorio = [{} for _ in range(len(listaInstancias))]
 
 for instancia in listaInstancias:
     tamanhoPop = 4
     tempoMaximo = 1 #tamanho a ser definido
     mutation_rate = 1
     #Para cada instância executar todo o algoritmo 10 vezes
-    #melhoresSolucoes = relatorio[instancia]
+    # print(listaInstancias.index(instancia))
+    # print(listaInstancias[listaInstancias.index(instancia)])
+    index_of_instance = listaInstancias.index(instancia)
+    melhoresSolucoes = relatorio[index_of_instance]
     for it in range (10):
         melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
         tempoInicial = time.time()
@@ -165,19 +168,21 @@ for instancia in listaInstancias:
                 melhorSolucao = melhorSolucaoAtual  
                 
             novasSolucoes = recombinacao(selecionarPop(populacao, aptidaoPop))
-            format_print(novasSolucoes)
+            #print('antes')
+            #format_print(novasSolucoes)
             novasSolucoes = mutacao(novasSolucoes, mutation_rate)
-            format_print(novasSolucoes)
-            break
+            #print('depois')
+            #format_print(novasSolucoes)
+            #break
             
             '''
             populacao = selecionarNovaGeracao(populacao, novasSolucoes)
             '''
             criterioParada2 += 1
         melhorSolucao['tempoFinal'] = time.time() - tempoInicial
-        #print(melhorSolucao)
-        #melhoresSolucoes = melhoresSolucoes | melhorSolucao
-        break
+        melhoresSolucoes = melhoresSolucoes | melhorSolucao
+        #print(melhoresSolucoes)
+    relatorio[index_of_instance] = melhoresSolucoes
+    print(relatorio)
     break
-    #relatorio[instancia] = melhoresSolucoes
 #salvarRelatorio(relatorio)
