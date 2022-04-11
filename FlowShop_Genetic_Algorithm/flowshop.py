@@ -102,65 +102,66 @@ def salvarRelatorio(relatorio):
 
 def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
-       
-#TODO ler os arquivos
-allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
-                 'tai50_5.txt','tai50_10.txt','tai50_20.txt',
-                 'tai100_5.txt','tai100_10.txt','tai100_20.txt',
-                 'tai200_10.txt'
-        ]
-criterioParada2 = 0 #TODO definir o critério de parada
 
-X = 0 #TODO definir o valor do x e se possível remover essa declaração
-import json
+def main():
+    allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
+                     'tai50_5.txt','tai50_10.txt','tai50_20.txt',
+                     'tai100_5.txt','tai100_10.txt','tai100_20.txt',
+                     'tai200_10.txt'
+            ]
+    
+    criterioParada2 = 0
 
-listaInstancias = lerInstancias(allFiles)
+    listaInstancias = lerInstancias(allFiles)
 
-relatorio = [{} for _ in range(len(listaInstancias))]
+    relatorio = [{} for _ in range(len(listaInstancias))]
 
-for instancia in listaInstancias:
-    tamanhoPop = 4
-    tempoMaximo = 1 #tamanho a ser definido
-    mutation_rate = 1
-    #Para cada instância executar todo o algoritmo 10 vezes
-    # print(listaInstancias.index(instancia))
-    # print(listaInstancias[listaInstancias.index(instancia)])
-    index_of_instance = listaInstancias.index(instancia)
-    melhoresSolucoes = relatorio[index_of_instance]
-    for it in range (10):
-        melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
-        tempoInicial = time.time()
-        populacao = criarPopulacaoInicial(instancia, tamanhoPop)
-       
-        while True:
-            if tempoMaximo <= time.time() - tempoInicial:
-                break
-            
-            #if criterioParada2: #critério de parada a ser definida
+    for instancia in listaInstancias:
+        tamanhoPop = 4
+        tempoMaximo = 1
+        mutation_rate = 1
+        #Para cada instância executar todo o algoritmo 10 vezes
+        # print(listaInstancias.index(instancia))
+        # print(listaInstancias[listaInstancias.index(instancia)])
+        index_of_instance = listaInstancias.index(instancia)
+        melhoresSolucoes = relatorio[index_of_instance]
+        for it in range (10):
+            melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
+            tempoInicial = time.time()
+            populacao = criarPopulacaoInicial(instancia, tamanhoPop)
+
+            while True:
+                if tempoMaximo <= time.time() - tempoInicial:
+                    break
+
+                #if criterioParada2: #critério de parada a ser definida
+                    #break
+                aptidaoPop = avaliarPop(populacao, instancia)
+
+                melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
+
+                if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
+                    melhorSolucao = melhorSolucaoAtual  
+
+                novasSolucoes = recombinacao(selecionarPop(populacao, aptidaoPop))
+                #print('antes')
+                #format_print(novasSolucoes)
+                novasSolucoes = mutacao(novasSolucoes, mutation_rate)
+                #print('depois')
+                #format_print(novasSolucoes)
                 #break
-            aptidaoPop = avaliarPop(populacao, instancia)
-           
-            melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
-           
-            if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
-                melhorSolucao = melhorSolucaoAtual  
-                
-            novasSolucoes = recombinacao(selecionarPop(populacao, aptidaoPop))
-            #print('antes')
-            #format_print(novasSolucoes)
-            novasSolucoes = mutacao(novasSolucoes, mutation_rate)
-            #print('depois')
-            #format_print(novasSolucoes)
-            #break
-            
-            '''
-            populacao = selecionarNovaGeracao(populacao, novasSolucoes)
-            '''
-            criterioParada2 += 1
-        melhorSolucao['tempoFinal'] = time.time() - tempoInicial
-        melhoresSolucoes = melhoresSolucoes | melhorSolucao
-        #print(melhoresSolucoes)
-    relatorio[index_of_instance] = melhoresSolucoes
-    print(relatorio)
-    break
-#salvarRelatorio(relatorio)
+
+                '''
+                populacao = selecionarNovaGeracao(populacao, novasSolucoes)
+                '''
+                criterioParada2 += 1
+            melhorSolucao['tempoFinal'] = time.time() - tempoInicial
+            melhoresSolucoes = melhoresSolucoes | melhorSolucao
+            #print(melhoresSolucoes)
+        relatorio[index_of_instance] = melhoresSolucoes
+        print(relatorio)
+        break
+    #salvarRelatorio(relatorio)
+
+if __name__ == "__main__":
+    main()
