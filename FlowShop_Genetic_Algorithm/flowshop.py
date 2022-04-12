@@ -126,7 +126,10 @@ def main():
         tempoMaximo = 1
         index_of_instance = listaInstancias.index(instancia)
         melhoresSolucoes = relatorio[index_of_instance]
-        for it in range (10):
+        
+        all_fitness, all_times = [], []
+        best_aof_all = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
+        for _ in range (10):
             melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
             tempoInicial = time.time()
             populacao = criarPopulacaoInicial(instancia, tamanhoPop)
@@ -136,7 +139,6 @@ def main():
                     break
                                
                 aptidaoPop = avaliarPop(populacao, instancia)
-                
                 melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
                 
                 prev_fitness = melhorSolucao['aptidao']
@@ -157,11 +159,22 @@ def main():
                 if criterioParada2 == 10: #critério de parada a ser definida
                     break
                 
-            melhorSolucao['tempoFinal'] = time.time() - tempoInicial
-            melhoresSolucoes = melhoresSolucoes | melhorSolucao
-        print(melhoresSolucoes)    
-        relatorio[index_of_instance] = melhoresSolucoes
-        #print(relatorio)
+           
+            melhorSolucao['tempoFinal'] =  float("{:.5f}".format(time.time() - tempoInicial))
+            all_fitness.append(melhorSolucao['aptidao'])
+            all_times.append(melhorSolucao['tempoFinal'])   
+            #print(melhorSolucao)
+          
+            if melhorSolucao['aptidao'] < best_aof_all['aptidao']:
+                best_aof_all = melhorSolucao
+                
+           # if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
+                    #melhorSolucao = melhorSolucaoAtual  
+            best_aof_all['all_fitness'] = all_fitness
+            best_aof_all['all_times'] = all_times
+        #print(best_aof_all)    
+        relatorio[index_of_instance] = best_aof_all
+        print(relatorio)
         break
     #salvarRelatorio(relatorio)
 
