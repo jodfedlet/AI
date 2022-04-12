@@ -1,15 +1,19 @@
+#To run this project, esentially you must have this dependencies: pandas, numpy, xlsxwriter
+#pip install pandas
+#pip install numpy
+#pip install xlsxwriter
 
 import sys
 import time
 import random
-from pandas import DataFrame
+import pandas as pd
 import numpy as np
 
 
 allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
-                     #'tai50_5.txt','tai50_10.txt','tai50_20.txt',
-                     #'tai100_5.txt','tai100_10.txt','tai100_20.txt',
-                     #'tai200_10.txt'
+                     'tai50_5.txt','tai50_10.txt','tai50_20.txt',
+                     'tai100_5.txt','tai100_10.txt','tai100_20.txt',
+                     'tai200_10.txt'
             ] 
 
 tamanhoPop = 100
@@ -81,6 +85,7 @@ def selecionarPop(populacao, aptidaoPop):
     selected_people = merge_list_into_tuple(aptidaoPop, populacao)
     return [i[1] for i in selected_people[:int(len(selected_people)/2)]] 
 
+#generate random mumber as position
 def get_random_pos(list_):
     return random.randrange(len(list_))
     
@@ -111,31 +116,45 @@ def mutacao(novasSolucoes):
 #função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     return [*generate_random_solution(len(populacaoAtual[0]), int(len(populacaoAtual) / 2)), *novasSolucoes]
+
+def export_data(data):
+    data = pd.DataFrame(data)
+       
+    writer = pd.ExcelWriter('reports/flow_shop_report.xlsx', engine='xlsxwriter')
+    data.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
+       
+    data.to_csv('reports/flow_shop_report.csv')
     
+    print('******Reports created successfully******')
+      
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
 def salvarRelatorio(relatorios):
-    solutions = []
+    instances_data, solutions = [], []
     lower_bound_f, upper_bound_f, mean_f, deviation_f = [], [], [], []
     lower_bound_t, upper_bound_t, mean_t, deviation_t = [], [], [], []
     
     for relatorio in relatorios:
         all_fitness = relatorio['all_fitness']
         all_times = relatorio['all_times']
+            
+        instances_data.append(f"({relatorio['n_jobs']} X {relatorio['n_machines']})")
         
         solutions.append(relatorio['solucao'])
         
-        lower_bound_f.append(min(all_fitness))
-        upper_bound_f.append(max(all_fitness))
-        mean_f.append(np.mean(all_fitness))
-        deviation_f.append(float("{:.5f}".format(np.std(all_fitness))))
+        lower_bound_f.append(round(min(all_fitness), 5))
+        upper_bound_f.append(round(max(all_fitness),5))
+        mean_f.append(round(np.mean(all_fitness), 5))
+        deviation_f.append(round(np.std(all_fitness), 5))
         
-        lower_bound_t.append(min(all_times))
-        upper_bound_t.append(max(all_times))
-        mean_t.append(np.mean(all_times))
-        deviation_t.append(float("{:.5f}".format(np.std(all_times))))
+        lower_bound_t.append(round(min(all_times), 5))
+        upper_bound_t.append(round(max(all_times), 5))
+        mean_t.append(round(np.mean(all_times), 5))
+        deviation_t.append(round(np.std(all_times), 5))
     
     report_data = {
+        'instances': instances_data,
         'solutions': solutions,
         'lower_bound_f': lower_bound_f,
         'upper_bound_f': upper_bound_f,
@@ -146,10 +165,7 @@ def salvarRelatorio(relatorios):
         'mean_t': mean_t,
         'deviation_t': deviation_t,
     }
-    
-
-    res = DataFrame(report_data)
-    print(res)
+    export_data(report_data)
 
 #for debugging structures
 def format_print(data):
@@ -162,8 +178,7 @@ def main():
     for instancia in listaInstancias:
         tempoMaximo = 1
         index_of_instance = listaInstancias.index(instancia)
-        melhoresSolucoes = relatorio[index_of_instance]
-        
+            
         all_fitness, all_times = [], []
         best_of_all = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
         
@@ -197,7 +212,9 @@ def main():
                 
             melhorSolucao['tempoFinal'] =  float("{:.5f}".format(time.time() - tempoInicial))
             all_fitness.append(melhorSolucao['aptidao'])
-            all_times.append(melhorSolucao['tempoFinal'])   
+            all_times.append(melhorSolucao['tempoFinal'])  
+            melhorSolucao['n_jobs'] = len(melhorSolucao['solucao'])
+            melhorSolucao['n_machines'] = len(instancia)
            
             if melhorSolucao['aptidao'] < best_of_all['aptidao']:
                 best_of_all = melhorSolucao
