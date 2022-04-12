@@ -3,6 +3,13 @@ import sys
 import time
 import random
 
+
+allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
+                     'tai50_5.txt','tai50_10.txt','tai50_20.txt',
+                     'tai100_5.txt','tai100_10.txt','tai100_20.txt',
+                     'tai200_10.txt'
+            ] 
+
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
 #param solucao deve ser uma lista de inteiros identificando as tarefas (de 1 até n onde n é o número de tarefas da instância)
@@ -43,14 +50,23 @@ def merge_list_into_tuple(key_list, list_value):
 def lerInstancias(files):
     return [getFirstInstanceOfFile(file) for file in files]
 
+def generate_random_solution(size_of_solution, number_of_solutions):
+    return [random.sample(range(1, size_of_solution+1), size_of_solution) for _ in range(number_of_solutions)]
+    
 #criar uma lista de soluções aleatórias (podem definir outro critério se desejarem) com o tamanho repassado
 def criarPopulacaoInicial(instance, size):
-    nElement = len(instance[0])
-    return [random.sample(range(1, nElement+1), nElement) for _ in range(size)]
+    return generate_random_solution(len(instance[0]), size)
      
 #usar a função makespan para avalaiar a aptidão de cada elemento da população
 def avaliarPop(population, instance):
-    return [makespan(instance, solution) for solution in population]
+    fitness_array = []
+    for solution in population:
+        fitness = makespan(instance, solution)
+        if isinstance(fitness, str):
+            fitness = sys.maxsize
+        fitness_array.append(fitness)
+    return fitness_array  
+    #return [makespan(instance, solution) for solution in population]
 
 #retorna a melhor solucao dentre a populacao atual
 def retornaMelhorSolucao(populacao, aptidaoPop):
@@ -77,24 +93,22 @@ def recombinacao(populacaoSelecionada):
     return solutions
 
 #função deve usar o operador de mutacao (definido pelo grupo) para modificar as soluções filhas (não precisa ser todas)
-def mutacao(novasSolucoes, mutation_rate):
-    mutation_rate = mutation_rate / 100
+def mutacao(novasSolucoes):
+    mutation_rate = 1 / 100
     for solution in novasSolucoes:
         rand_pos = get_random_pos(solution)
-        current_item = solution[rand_pos]
-        
+        current_item = solution
         while True:
             random_item = random.randint(1, len(solution))
             if random_item != current_item:
                 solution[rand_pos] = random_item
                 break
-    
     return novasSolucoes
 
 #função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
 def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
-    pass
-
+    return [*generate_random_solution(len(populacaoAtual[0]), int(len(populacaoAtual) / 2)), *novasSolucoes]
+    
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
 def salvarRelatorio(relatorio):
@@ -102,64 +116,52 @@ def salvarRelatorio(relatorio):
 
 def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
-
+   
 def main():
-    allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
-                     'tai50_5.txt','tai50_10.txt','tai50_20.txt',
-                     'tai100_5.txt','tai100_10.txt','tai100_20.txt',
-                     'tai200_10.txt'
-            ]
-    
-    criterioParada2 = 0
-
     listaInstancias = lerInstancias(allFiles)
-
     relatorio = [{} for _ in range(len(listaInstancias))]
 
     for instancia in listaInstancias:
-        tamanhoPop = 4
+        tamanhoPop = 100
         tempoMaximo = 1
-        mutation_rate = 1
-        #Para cada instância executar todo o algoritmo 10 vezes
-        # print(listaInstancias.index(instancia))
-        # print(listaInstancias[listaInstancias.index(instancia)])
         index_of_instance = listaInstancias.index(instancia)
         melhoresSolucoes = relatorio[index_of_instance]
         for it in range (10):
             melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
             tempoInicial = time.time()
             populacao = criarPopulacaoInicial(instancia, tamanhoPop)
-
+            criterioParada2 = 1
             while True:
                 if tempoMaximo <= time.time() - tempoInicial:
                     break
-
-                #if criterioParada2: #critério de parada a ser definida
-                    #break
+                               
                 aptidaoPop = avaliarPop(populacao, instancia)
-
+                
                 melhorSolucaoAtual = retornaMelhorSolucao(populacao, aptidaoPop)
-
+                
+                prev_fitness = melhorSolucao['aptidao']
                 if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
                     melhorSolucao = melhorSolucaoAtual  
-
-                novasSolucoes = recombinacao(selecionarPop(populacao, aptidaoPop))
-                #print('antes')
-                #format_print(novasSolucoes)
-                novasSolucoes = mutacao(novasSolucoes, mutation_rate)
-                #print('depois')
-                #format_print(novasSolucoes)
-                #break
-
-                '''
+                
+                if melhorSolucao['aptidao'] == prev_fitness:
+                    criterioParada2 += 1
+                else: criterioParada2 = 0    
+                
+                populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
+               
+                novasSolucoes = recombinacao(populacaoSelecionada)
+                novasSolucoes = mutacao(novasSolucoes)
+                     
                 populacao = selecionarNovaGeracao(populacao, novasSolucoes)
-                '''
-                criterioParada2 += 1
+               
+                if criterioParada2 == 10: #critério de parada a ser definida
+                    break
+                
             melhorSolucao['tempoFinal'] = time.time() - tempoInicial
             melhoresSolucoes = melhoresSolucoes | melhorSolucao
-            #print(melhoresSolucoes)
+        print(melhoresSolucoes)    
         relatorio[index_of_instance] = melhoresSolucoes
-        print(relatorio)
+        #print(relatorio)
         break
     #salvarRelatorio(relatorio)
 
