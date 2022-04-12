@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 
-allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
+all_files = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                      'tai50_5.txt','tai50_10.txt','tai50_20.txt',
                      'tai100_5.txt','tai100_10.txt','tai100_20.txt',
                      'tai200_10.txt'
@@ -126,7 +126,7 @@ def export_data(data):
        
     data.to_csv('reports/flow_shop_report.csv')
     
-    print('******Reports created successfully******')
+    print('****** Reports created successfully ******')
       
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
@@ -154,16 +154,17 @@ def salvarRelatorio(relatorios):
         deviation_t.append(round(np.std(all_times), 5))
     
     report_data = {
-        'instances': instances_data,
-        'solutions': solutions,
-        'lower_bound_f': lower_bound_f,
-        'upper_bound_f': upper_bound_f,
-        'mean_f': mean_f,
-        'deviation_f': deviation_f,
-        'lower_bound_t': lower_bound_t,
-        'upper_bound_t': upper_bound_t,
-        'mean_t': mean_t,
-        'deviation_t': deviation_t,
+        'char': instances_data, #características das instâncias
+        'Psize': [tamanhoPop for _ in range(len(all_files))], #tamanho da população usado para cada instância
+        'sol': solutions,# as melhores soluções de cada instância
+        'lbf': lower_bound_f, #o lower bound do fitness
+        'ubf': upper_bound_f, # upper bound do fitness
+        'mf': mean_f, #média do fitness
+        'dpf': deviation_f, #desvio padrão do fitness
+        'lbt': lower_bound_t, #lower bound do tempo
+        'ubt': upper_bound_t, #upper bound do tempo
+        'mt': mean_t, #média do tempo
+        'dpt': deviation_t,#desvio padrão do tempo
     }
     export_data(report_data)
 
@@ -172,7 +173,7 @@ def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
    
 def main():
-    listaInstancias = lerInstancias(allFiles)
+    listaInstancias = lerInstancias(all_files)
     relatorio = [{} for _ in range(len(listaInstancias))]
 
     for instancia in listaInstancias:
