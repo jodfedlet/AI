@@ -10,6 +10,8 @@ allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                      'tai200_10.txt'
             ] 
 
+tamanhoPop = 100
+
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
 #param solucao deve ser uma lista de inteiros identificando as tarefas (de 1 até n onde n é o número de tarefas da instância)
@@ -54,8 +56,8 @@ def generate_random_solution(size_of_solution, number_of_solutions):
     return [random.sample(range(1, size_of_solution+1), size_of_solution) for _ in range(number_of_solutions)]
     
 #criar uma lista de soluções aleatórias (podem definir outro critério se desejarem) com o tamanho repassado
-def criarPopulacaoInicial(instance, size):
-    return generate_random_solution(len(instance[0]), size)
+def criarPopulacaoInicial(instance):
+    return generate_random_solution(len(instance[0]), tamanhoPop)
      
 #usar a função makespan para avalaiar a aptidão de cada elemento da população
 def avaliarPop(population, instance):
@@ -66,8 +68,7 @@ def avaliarPop(population, instance):
             fitness = sys.maxsize
         fitness_array.append(fitness)
     return fitness_array  
-    #return [makespan(instance, solution) for solution in population]
-
+  
 #retorna a melhor solucao dentre a populacao atual
 def retornaMelhorSolucao(populacao, aptidaoPop):
     best = merge_list_into_tuple(aptidaoPop, populacao)[0]
@@ -114,6 +115,7 @@ def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
 def salvarRelatorio(relatorio):
     pass
 
+#for debugging structures
 def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
    
@@ -122,17 +124,17 @@ def main():
     relatorio = [{} for _ in range(len(listaInstancias))]
 
     for instancia in listaInstancias:
-        tamanhoPop = 100
         tempoMaximo = 1
         index_of_instance = listaInstancias.index(instancia)
         melhoresSolucoes = relatorio[index_of_instance]
         
         all_fitness, all_times = [], []
-        best_aof_all = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
+        best_of_all = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
+        
         for _ in range (10):
             melhorSolucao = {'solucao':[], 'aptidao':sys.maxsize, 'tempoFinal':0}
             tempoInicial = time.time()
-            populacao = criarPopulacaoInicial(instancia, tamanhoPop)
+            populacao = criarPopulacaoInicial(instancia)
             criterioParada2 = 1
             while True:
                 if tempoMaximo <= time.time() - tempoInicial:
@@ -150,30 +152,23 @@ def main():
                 else: criterioParada2 = 0    
                 
                 populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
-               
                 novasSolucoes = recombinacao(populacaoSelecionada)
                 novasSolucoes = mutacao(novasSolucoes)
-                     
                 populacao = selecionarNovaGeracao(populacao, novasSolucoes)
                
                 if criterioParada2 == 10: #critério de parada a ser definida
                     break
                 
-           
             melhorSolucao['tempoFinal'] =  float("{:.5f}".format(time.time() - tempoInicial))
             all_fitness.append(melhorSolucao['aptidao'])
             all_times.append(melhorSolucao['tempoFinal'])   
-            #print(melhorSolucao)
-          
+           
             if melhorSolucao['aptidao'] < best_aof_all['aptidao']:
                 best_aof_all = melhorSolucao
                 
-           # if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
-                    #melhorSolucao = melhorSolucaoAtual  
-            best_aof_all['all_fitness'] = all_fitness
-            best_aof_all['all_times'] = all_times
-        #print(best_aof_all)    
-        relatorio[index_of_instance] = best_aof_all
+            best_of_all['all_fitness'] = all_fitness
+            best_of_all['all_times'] = all_times    
+        relatorio[index_of_instance] = best_of_all
         print(relatorio)
         break
     #salvarRelatorio(relatorio)
