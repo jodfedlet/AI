@@ -118,13 +118,16 @@ def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     return [*generate_random_solution(len(populacaoAtual[0]), int(len(populacaoAtual) / 2)), *novasSolucoes]
 
 def export_data(data):
-    data = pd.DataFrame(data)
+    data = pd.DataFrame(data, index=[i for i in range(1,len(all_files)+1)])
+    
+    #import matplotlib.pyplot as plt
        
     writer = pd.ExcelWriter('reports/flow_shop_report.xlsx', engine='xlsxwriter')
     data.to_excel(writer, sheet_name='Sheet1')
     writer.save()
        
     data.to_csv('reports/flow_shop_report.csv')
+    #plt.plot(data)
     
     print('****** Reports created successfully ******')
       
@@ -154,7 +157,7 @@ def salvarRelatorio(relatorios):
         deviation_t.append(round(np.std(all_times), 5))
     
     report_data = {
-        'char': instances_data, #características das instâncias
+        'j X m ': instances_data, #características das instâncias ( jobs x machines)
         'Psize': [tamanhoPop for _ in range(len(all_files))], #tamanho da população usado para cada instância
         'sol': solutions,# as melhores soluções de cada instância
         'lbf': lower_bound_f, #o lower bound do fitness
