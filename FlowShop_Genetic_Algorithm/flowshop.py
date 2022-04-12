@@ -2,12 +2,14 @@
 import sys
 import time
 import random
+from pandas import DataFrame
+import numpy as np
 
 
 allFiles = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
-                     'tai50_5.txt','tai50_10.txt','tai50_20.txt',
-                     'tai100_5.txt','tai100_10.txt','tai100_20.txt',
-                     'tai200_10.txt'
+                     #'tai50_5.txt','tai50_10.txt','tai50_20.txt',
+                     #'tai100_5.txt','tai100_10.txt','tai100_20.txt',
+                     #'tai200_10.txt'
             ] 
 
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
@@ -111,8 +113,42 @@ def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
     
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
 #salvar em formato de tabela (pode ser um CSV) em um arquivo
-def salvarRelatorio(relatorio):
-    pass
+def salvarRelatorio(relatorios):
+    solutions = []
+    lower_bound_f, upper_bound_f, mean_f, deviation_f = [], [], [], []
+    lower_bound_t, upper_bound_t, mean_t, deviation_t = [], [], [], []
+    
+    for relatorio in relatorios:
+        all_fitness = relatorio['all_fitness']
+        all_times = relatorio['all_times']
+        
+        solutions.append(relatorio['solucao'])
+        
+        lower_bound_f.append(min(all_fitness))
+        upper_bound_f.append(max(all_fitness))
+        mean_f.append(np.mean(all_fitness))
+        deviation_f.append(float("{:.5f}".format(np.std(all_fitness))))
+        
+        lower_bound_t.append(min(all_times))
+        upper_bound_t.append(max(all_times))
+        mean_t.append(np.mean(all_times))
+        deviation_t.append(float("{:.5f}".format(np.std(all_times))))
+    
+    report_data = {
+        'solutions': solutions,
+        'lower_bound_f': lower_bound_f,
+        'upper_bound_f': upper_bound_f,
+        'mean_f': mean_f,
+        'deviation_f': deviation_f,
+        'lower_bound_t': lower_bound_t,
+        'upper_bound_t': upper_bound_t,
+        'mean_t': mean_t,
+        'deviation_t': deviation_t,
+    }
+    
+
+    res = DataFrame(report_data)
+    print(res)
 
 def format_print(data):
     print('\n'.join('{}: {}'.format(*val) for val in enumerate(data)))
@@ -150,33 +186,24 @@ def main():
                 else: criterioParada2 = 0    
                 
                 populacaoSelecionada = selecionarPop(populacao, aptidaoPop)
-               
                 novasSolucoes = recombinacao(populacaoSelecionada)
                 novasSolucoes = mutacao(novasSolucoes)
-                     
                 populacao = selecionarNovaGeracao(populacao, novasSolucoes)
                
                 if criterioParada2 == 10: #critério de parada a ser definida
                     break
                 
-           
             melhorSolucao['tempoFinal'] =  float("{:.5f}".format(time.time() - tempoInicial))
             all_fitness.append(melhorSolucao['aptidao'])
             all_times.append(melhorSolucao['tempoFinal'])   
-            #print(melhorSolucao)
-          
+            
             if melhorSolucao['aptidao'] < best_aof_all['aptidao']:
                 best_aof_all = melhorSolucao
-                
-           # if melhorSolucao['aptidao'] > melhorSolucaoAtual['aptidao']:
-                    #melhorSolucao = melhorSolucaoAtual  
+                 
             best_aof_all['all_fitness'] = all_fitness
-            best_aof_all['all_times'] = all_times
-        #print(best_aof_all)    
+            best_aof_all['all_times'] = all_times   
         relatorio[index_of_instance] = best_aof_all
-        print(relatorio)
-        break
-    #salvarRelatorio(relatorio)
+    salvarRelatorio(relatorio)
 
 if __name__ == "__main__":
     main()
