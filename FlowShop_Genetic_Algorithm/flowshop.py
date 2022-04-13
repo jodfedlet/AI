@@ -103,7 +103,7 @@ def recombinacao(populacaoSelecionada):
 
 #função deve usar o operador de mutacao (definido pelo grupo) para modificar as soluções filhas (não precisa ser todas)
 def mutacao(novasSolucoes):
-    if round(random.random(), 2) <= mutation_rate / 100:
+    if round(random.random(), 2) < mutation_rate / 100:
         for solution in novasSolucoes:
             rand_pos = get_random_pos(solution)
             current_item = solution
