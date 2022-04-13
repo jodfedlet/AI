@@ -16,7 +16,7 @@ all_files = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                      'tai200_10.txt'
             ] 
 
-tamanhoPop = 4
+tamanhoPop = 100
 mutation_rate = 5
 
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
