@@ -16,7 +16,8 @@ all_files = ['tai20_5.txt','tai20_10.txt','tai20_20.txt',
                      'tai200_10.txt'
             ] 
 
-tamanhoPop = 100
+tamanhoPop = 4
+mutation_rate = 5
 
 #Função que calcula a aptidao de uma solução dada uma instância para o problema flow shop sequencing
 #A aptidão desse problema é o makespan, que deve ser minimizado
@@ -102,15 +103,15 @@ def recombinacao(populacaoSelecionada):
 
 #função deve usar o operador de mutacao (definido pelo grupo) para modificar as soluções filhas (não precisa ser todas)
 def mutacao(novasSolucoes):
-    mutation_rate = 1 / 100
-    for solution in novasSolucoes:
-        rand_pos = get_random_pos(solution)
-        current_item = solution
-        while True:
-            random_item = random.randint(1, len(solution))
-            if random_item != current_item:
-                solution[rand_pos] = random_item
-                break
+    if round(random.random(), 2) <= mutation_rate / 100:
+        for solution in novasSolucoes:
+            rand_pos = get_random_pos(solution)
+            current_item = solution
+            while True:
+                random_item = random.randint(1, len(solution))
+                if random_item != current_item:
+                    solution[rand_pos] = random_item
+                    break         
     return novasSolucoes
 
 #função deve criar uma nova população com as soluções novas (eliminando as antigas ou usando outro critério de seleção desejado)
@@ -139,11 +140,9 @@ def salvarRelatorio(relatorios):
     lower_bound_t, upper_bound_t, mean_t, deviation_t = [], [], [], []
     
     for relatorio in relatorios:
-        all_fitness = relatorio['all_fitness']
         all_times = relatorio['all_times']
-            
-        instances_data.append(f"({relatorio['n_jobs']} X {relatorio['n_machines']})")
-        
+        all_fitness = relatorio['all_fitness']
+                    
         solutions.append(relatorio['solucao'])
         
         lower_bound_f.append(round(min(all_fitness), 5))
@@ -155,6 +154,8 @@ def salvarRelatorio(relatorios):
         upper_bound_t.append(round(max(all_times), 5))
         mean_t.append(round(np.mean(all_times), 5))
         deviation_t.append(round(np.std(all_times), 5))
+        
+        instances_data.append(f"({relatorio['n_jobs']} X {relatorio['n_machines']})")
     
     report_data = {
         'j X m ': instances_data, #características das instâncias ( jobs x machines)
@@ -213,7 +214,7 @@ def main():
                
                 if criterioParada2 == 10: #critério de parada a ser definida
                     break
-                
+        
             melhorSolucao['tempoFinal'] =  float("{:.5f}".format(time.time() - tempoInicial))
             all_fitness.append(melhorSolucao['aptidao'])
             all_times.append(melhorSolucao['tempoFinal'])  
