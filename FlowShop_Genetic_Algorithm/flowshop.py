@@ -120,16 +120,13 @@ def selecionarNovaGeracao(populacaoAtual, novasSolucoes):
 
 def export_data(data):
     data = pd.DataFrame(data, index=[i for i in range(1,len(all_files)+1)])
-    
-    #import matplotlib.pyplot as plt
-       
+ 
     writer = pd.ExcelWriter('reports/flow_shop_report.xlsx', engine='xlsxwriter')
     data.to_excel(writer, sheet_name='Sheet1')
     writer.save()
        
     data.to_csv('reports/flow_shop_report.csv')
-    #plt.plot(data)
-    
+
     print('****** Reports created successfully ******')
       
 #computar o lower bound, upper bound, valores médios e desvios (tanto para aptidão quanto para o tempo de execução) para cada instância
