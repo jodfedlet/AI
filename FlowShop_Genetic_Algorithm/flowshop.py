@@ -106,10 +106,9 @@ def mutacao(novasSolucoes):
     if round(random.random(), 2) < mutation_rate / 100:
         for solution in novasSolucoes:
             rand_pos = get_random_pos(solution)
-            current_item = solution[rand_pos]
             while True:
                 random_item = random.randint(1, len(solution))
-                if random_item != current_item:
+                if random_item != solution[rand_pos]:
                     solution[rand_pos] = random_item
                     break         
     return novasSolucoes
